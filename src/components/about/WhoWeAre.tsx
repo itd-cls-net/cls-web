@@ -13,12 +13,13 @@ export default function WhoWeAre() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-2">
           {/* Left — Image */}
-          <div className="relative h-[400px] overflow-hidden rounded-2xl lg:h-[520px]">
+          <div className="relative w-full overflow-hidden rounded-md shadow-lg shadow-slate-200/50 ring-1 ring-slate-100">
             <Image
-              src="/gallery/5_enhanced.jpg"
+              src="/facility-building.png"
               alt="CLS Laboratory at TICEL Bio Park"
-              fill
-              className="object-cover"
+              width={1000}
+              height={800}
+              className="w-full h-auto"
             />
           </div>
 

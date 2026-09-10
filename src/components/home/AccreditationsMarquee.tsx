@@ -1,35 +1,24 @@
-"use client";
-
 import Image from "next/image";
+import Link from "next/link";
+import { client } from "@/sanity/client";
 
-const accreditations = [
-  {
-    src: "/accreditations/cdsco.jpg",
-    alt: "CDSCO",
-    text: "Form 37",
-    width: 280,
-  },
-  {
-    src: "/accreditations/nabl_new.jpg",
-    alt: "NABL",
-    text: "ISO/IEC 17025",
-    width: 240,
-  },
-  {
-    src: "/accreditations/cdsco.jpg",
-    alt: "CDSCO",
-    text: "Form MD - 40",
-    width: 280,
-  },
-  {
-    src: "/accreditations/fda.png",
-    alt: "FDA",
-    text: "USFDA INSPECTED (EIR Received)",
-    width: 240,
-  },
-];
+const GET_ACCREDITATIONS_QUERY = `
+  *[_type == "accreditation"] | order(order asc) {
+    _id,
+    authority,
+    title,
+    "logoUrl": logo.asset->url
+  }
+`;
 
-export default function AccreditationsMarquee() {
+export default async function AccreditationsMarquee() {
+  const accreditations = await client.fetch(GET_ACCREDITATIONS_QUERY);
+
+  // If no accreditations in Sanity yet, don't show the section or just show empty
+  if (!accreditations || accreditations.length === 0) {
+    return null;
+  }
+
   // Duplicate the array to create a seamless loop
   const marqueeItems = [...accreditations, ...accreditations];
 
@@ -51,26 +40,34 @@ export default function AccreditationsMarquee() {
 
         <div className="flex w-fit animate-marquee items-center space-x-6 sm:space-x-10 pl-6 sm:pl-10">
           {marqueeItems.map((item, index) => (
-            <div 
+            <Link 
+              href="/accreditations"
               key={index} 
               className="group flex h-[280px] w-[350px] shrink-0 flex-col items-center justify-center rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:-translate-y-2 hover:border-brand-primary/30 hover:shadow-xl hover:shadow-brand-primary/10"
             >
               <div className="relative flex h-40 w-full items-center justify-center transition-transform duration-500 group-hover:scale-105">
-                <Image
-                  src={item.src}
-                  alt={item.alt}
-                  width={item.width}
-                  height={160}
-                  className="object-contain max-h-full"
-                />
+                {item.logoUrl ? (
+                  <Image
+                    src={item.logoUrl}
+                    alt={item.authority}
+                    width={240}
+                    height={160}
+                    className="object-contain max-h-full"
+                  />
+                ) : (
+                  <div className="text-xl font-bold text-slate-400">{item.authority}</div>
+                )}
               </div>
               
               <div className="mt-4 w-full border-t border-slate-100 pt-5 text-center">
                 <p className="text-sm font-bold uppercase tracking-widest text-brand-dark">
-                  {item.text}
+                  {item.authority}
+                </p>
+                <p className="mt-1 text-xs text-slate-500 line-clamp-1">
+                  {item.title}
                 </p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
